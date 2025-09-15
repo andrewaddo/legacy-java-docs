@@ -16,3 +16,9 @@ npx bmad-method install
 ## select "BMad Agile Core System"
 ## select "Gemini CLI" for the IDE options
 ```
+
+## Generate documentations and tests
+
+```prompts
+@.bmad-core/agents/pm.md *create-brownfield-prd
+```
