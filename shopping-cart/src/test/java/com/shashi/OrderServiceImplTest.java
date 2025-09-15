@@ -1,6 +1,7 @@
 package com.shashi;
 
 import com.shashi.beans.OrderBean;
+import com.shashi.beans.OrderDetails;
 import com.shashi.beans.TransactionBean;
 import com.shashi.service.impl.OrderServiceImpl;
 import com.shashi.utility.DBUtil;
@@ -9,13 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -26,6 +24,7 @@ class OrderServiceImplTest {
     private MockedStatic<DBUtil> dbUtilMockedStatic;
     private Connection connection;
     private PreparedStatement preparedStatement;
+    private ResultSet resultSet;
 
     @BeforeEach
     void setUp() throws SQLException {
@@ -34,9 +33,11 @@ class OrderServiceImplTest {
         dbUtilMockedStatic = mockStatic(DBUtil.class);
         connection = mock(Connection.class);
         preparedStatement = mock(PreparedStatement.class);
+        resultSet = mock(ResultSet.class);
 
         dbUtilMockedStatic.when(DBUtil::provideConnection).thenReturn(connection);
         when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
     }
 
     @AfterEach
@@ -124,5 +125,73 @@ class OrderServiceImplTest {
 
         // Assert
         assertFalse(result);
+    }
+
+    // =============== Tests for countSoldItem ===============
+
+    @Test
+    void testCountSoldItem_WhenItemFound_ShouldReturnCount() throws SQLException {
+        // Arrange
+        when(resultSet.next()).thenReturn(true);
+        when(resultSet.getInt(1)).thenReturn(42);
+
+        // Act
+        int count = orderService.countSoldItem("prod1");
+
+        // Assert
+        assertEquals(42, count);
+    }
+
+    @Test
+    void testCountSoldItem_WhenItemNotFound_ShouldReturnZero() throws SQLException {
+        // Arrange
+        when(resultSet.next()).thenReturn(false);
+
+        // Act
+        int count = orderService.countSoldItem("prod1");
+
+        // Assert
+        assertEquals(0, count);
+    }
+
+    // =============== Tests for getAllOrders ===============
+
+    @Test
+    void testGetAllOrders_WhenOrdersExist_ShouldReturnOrderList() throws SQLException {
+        // Arrange
+        when(resultSet.next()).thenReturn(true, true, false);
+
+        // Act
+        List<OrderBean> orders = orderService.getAllOrders();
+
+        // Assert
+        assertNotNull(orders);
+        assertEquals(2, orders.size());
+    }
+
+    // =============== Tests for shipNow ===============
+
+    @Test
+    void testShipNow_WhenSuccessful_ShouldReturnSuccessMessage() throws SQLException {
+        // Arrange
+        when(preparedStatement.executeUpdate()).thenReturn(1);
+
+        // Act
+        String status = orderService.shipNow("order1", "prod1");
+
+        // Assert
+        assertEquals("Order Has been shipped successfully!!", status);
+    }
+
+    @Test
+    void testShipNow_WhenUpdateFails_ShouldReturnFailureMessage() throws SQLException {
+        // Arrange
+        when(preparedStatement.executeUpdate()).thenReturn(0);
+
+        // Act
+        String status = orderService.shipNow("order1", "prod1");
+
+        // Assert
+        assertEquals("FAILURE", status);
     }
 }

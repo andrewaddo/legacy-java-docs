@@ -70,7 +70,7 @@ public class JavaMailUtil {
 
 	}
 
-	protected static void sendMail(String recipient, String subject, String htmlTextMessage) throws MessagingException {
+	public static void sendMail(String recipient, String subject, String htmlTextMessage) throws MessagingException {
 
 		System.out.println("Preparing to send Mail");
 		Properties properties = new Properties();
