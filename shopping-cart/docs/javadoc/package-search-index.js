@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.shashi.beans"},{"l":"com.shashi.constants"},{"l":"com.shashi.service"},{"l":"com.shashi.service.impl"},{"l":"com.shashi.srv"},{"l":"com.shashi.utility"}];updateSearchResults();
