@@ -2,12 +2,32 @@ package com.shashi.beans;
 
 import java.io.Serializable;
 
+/**
+ * A JavaBean representing a user in the shopping system.
+ */
 @SuppressWarnings("serial")
 public class UserBean implements Serializable {
+
+	private String name;
+	private Long mobile;
+	private String email;
+	private String address;
+	private int pinCode;
+	private String password;
 
 	public UserBean() {
 	}
 
+	/**
+	 * Constructs a new UserBean with the specified details.
+	 *
+	 * @param userName The user's full name.
+	 * @param mobileNo The user's mobile number.
+	 * @param emailId The user's email address.
+	 * @param address The user's address.
+	 * @param pinCode The user's postal code.
+	 * @param password The user's password.
+	 */
 	public UserBean(String userName, Long mobileNo, String emailId, String address, int pinCode, String password) {
 		super();
 		this.name = userName;
@@ -17,13 +37,6 @@ public class UserBean implements Serializable {
 		this.pinCode = pinCode;
 		this.password = password;
 	}
-
-	private String name;
-	private Long mobile;
-	private String email;
-	private String address;
-	private int pinCode;
-	private String password;
 
 	public String getName() {
 		return name;

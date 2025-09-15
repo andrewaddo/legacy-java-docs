@@ -19,6 +19,8 @@ import com.shashi.service.impl.ProductServiceImpl;
 
 /**
  * Servlet implementation class UpdateToCart
+ * 
+ * This servlet handles updating the quantity of a product in the user's cart.
  */
 @WebServlet("/UpdateToCart")
 public class UpdateToCart extends HttpServlet {
@@ -29,23 +31,32 @@ public class UpdateToCart extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP GET request for updating the cart.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		HttpSession session = request.getSession();
 		String userName = (String) session.getAttribute("username");
 		String password = (String) session.getAttribute("password");
 
+		// Session validation
 		if (userName == null || password == null) {
 
 			response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
+			return;
 		}
-
-		// login Check Successfull
 
 		String userId = userName;
 		String prodId = request.getParameter("pid");
 		int pQty = Integer.parseInt(request.getParameter("pqty"));
 
+		// This servlet is untestable because it directly instantiates multiple service classes.
 		CartServiceImpl cart = new CartServiceImpl();
 
 		ProductServiceImpl productDao = new ProductServiceImpl();
@@ -58,6 +69,7 @@ public class UpdateToCart extends HttpServlet {
 
 		response.setContentType("text/html");
 
+		// Logic to handle cases where requested quantity is greater than available stock.
 		if (availableQty < pQty) {
 
 			String status = cart.updateProductToCart(userId, prodId, availableQty);
@@ -66,6 +78,7 @@ public class UpdateToCart extends HttpServlet {
 					+ " are available in the shop! So we are adding only " + availableQty + " products into Your Cart"
 					+ "";
 
+			// Create a demand for the out-of-stock quantity
 			DemandBean demandBean = new DemandBean(userName, product.getProdId(), pQty - availableQty);
 
 			DemandServiceImpl demand = new DemandServiceImpl();
@@ -83,6 +96,7 @@ public class UpdateToCart extends HttpServlet {
 			pw.println("<script>document.getElementById('message').innerHTML='" + status + "'</script>");
 
 		} else {
+			// If enough stock is available, update the cart with the requested quantity.
 			String status = cart.updateProductToCart(userId, prodId, pQty);
 
 			RequestDispatcher rd = request.getRequestDispatcher("cartDetails.jsp");
@@ -94,6 +108,14 @@ public class UpdateToCart extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

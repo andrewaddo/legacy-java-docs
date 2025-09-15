@@ -3,11 +3,11 @@ package com.shashi.beans;
 import java.io.InputStream;
 import java.io.Serializable;
 
+/**
+ * A JavaBean representing a product in the shopping system.
+ */
 @SuppressWarnings("serial")
 public class ProductBean implements Serializable {
-
-	public ProductBean() {
-	}
 
 	private String prodId;
 	private String prodName;
@@ -16,6 +16,9 @@ public class ProductBean implements Serializable {
 	private double prodPrice;
 	private int prodQuantity;
 	private InputStream prodImage;
+
+	public ProductBean() {
+	}
 
 	public ProductBean(String prodId, String prodName, String prodType, String prodInfo, double prodPrice,
 			int prodQuantity, InputStream prodImage) {

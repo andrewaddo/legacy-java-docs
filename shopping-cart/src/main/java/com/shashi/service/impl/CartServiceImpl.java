@@ -13,8 +13,21 @@ import com.shashi.beans.ProductBean;
 import com.shashi.service.CartService;
 import com.shashi.utility.DBUtil;
 
+/**
+ * Implementation of the CartService interface.
+ * This class handles all business logic related to the user's shopping cart.
+ */
 public class CartServiceImpl implements CartService {
 
+	/**
+	 * Adds a product to the user's cart. This method contains complex logic for handling stock and demand.
+	 * NOTE: This method is currently untestable due to its tight coupling with other service implementations.
+	 *
+	 * @param userId The ID of the user.
+	 * @param prodId The ID of the product to add.
+	 * @param prodQty The quantity of the product to add.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String addProductToCart(String userId, String prodId, int prodQty) {
 		String status = "Failed to Add into Cart";
@@ -27,6 +40,7 @@ public class CartServiceImpl implements CartService {
 
 		try {
 
+			// Check if the product is already in the user's cart
 			ps = con.prepareStatement("select * from usercart where username=? and prodid=?");
 
 			ps.setString(1, userId);
@@ -38,12 +52,14 @@ public class CartServiceImpl implements CartService {
 
 				int cartQuantity = rs.getInt("quantity");
 
+				// This method creates new service instances, making it untestable without refactoring.
 				ProductBean product = new ProductServiceImpl().getProductDetails(prodId);
 
 				int availableQty = product.getProdQuantity();
 
 				prodQty += cartQuantity;
-				//
+				
+				// If the desired quantity is more than what is available in stock
 				if (availableQty < prodQty) {
 
 					status = updateProductToCart(userId, prodId, availableQty);
@@ -52,6 +68,7 @@ public class CartServiceImpl implements CartService {
 							+ " are available in the shop! So we are adding only " + availableQty
 							+ " no of that item into Your Cart" + "";
 
+					// Add the remaining quantity to the user's demand list
 					DemandBean demandBean = new DemandBean(userId, product.getProdId(), prodQty - availableQty);
 
 					DemandServiceImpl demand = new DemandServiceImpl();
@@ -81,6 +98,12 @@ public class CartServiceImpl implements CartService {
 		return status;
 	}
 
+	/**
+	 * Retrieves all items in a user's cart.
+	 *
+	 * @param userId The user's ID.
+	 * @return A list of CartBean objects.
+	 */
 	@Override
 	public List<CartBean> getAllCartItems(String userId) {
 		List<CartBean> items = new ArrayList<CartBean>();
@@ -121,6 +144,12 @@ public class CartServiceImpl implements CartService {
 		return items;
 	}
 
+	/**
+	 * Gets the total number of items in a user's cart (sum of quantities).
+	 *
+	 * @param userId The user's ID.
+	 * @return The total number of items.
+	 */
 	@Override
 	public int getCartCount(String userId) {
 		int count = 0;
@@ -153,6 +182,13 @@ public class CartServiceImpl implements CartService {
 		return count;
 	}
 
+	/**
+	 * Removes one unit of a product from the cart. If the quantity becomes zero, the product is removed entirely.
+	 *
+	 * @param userId The user's ID.
+	 * @param prodId The product's ID.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String removeProductFromCart(String userId, String prodId) {
 		String status = "Product Removal Failed";
@@ -178,6 +214,7 @@ public class CartServiceImpl implements CartService {
 
 				prodQuantity -= 1;
 
+				// If quantity is still greater than 0, update the row.
 				if (prodQuantity > 0) {
 					ps2 = con.prepareStatement("update usercart set quantity=? where username=? and prodid=?");
 
@@ -192,7 +229,7 @@ public class CartServiceImpl implements CartService {
 					if (k > 0)
 						status = "Product Successfully removed from the Cart!";
 				} else if (prodQuantity <= 0) {
-
+					// If quantity is 0 or less, delete the row entirely.
 					ps2 = con.prepareStatement("delete from usercart where username=? and prodid=?");
 
 					ps2.setString(1, userId);
@@ -224,6 +261,13 @@ public class CartServiceImpl implements CartService {
 		return status;
 	}
 
+	/**
+	 * Removes a product entirely from the cart, regardless of quantity.
+	 *
+	 * @param userId The user's ID.
+	 * @param prodId The product's ID.
+	 * @return true if the product was removed successfully, false otherwise.
+	 */
 	@Override
 	public boolean removeAProduct(String userId, String prodId) {
 		boolean flag = false;
@@ -256,6 +300,14 @@ public class CartServiceImpl implements CartService {
 		return flag;
 	}
 
+	/**
+	 * Updates the quantity of a product in the cart. Can also be used to add a new product to the cart if it doesn't exist.
+	 *
+	 * @param userId The user's ID.
+	 * @param prodId The product's ID.
+	 * @param prodQty The new quantity.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String updateProductToCart(String userId, String prodId, int prodQty) {
 
@@ -269,6 +321,7 @@ public class CartServiceImpl implements CartService {
 
 		try {
 
+			// Check if the product is already in the cart
 			ps = con.prepareStatement("select * from usercart where username=? and prodid=?");
 
 			ps.setString(1, userId);
@@ -277,7 +330,7 @@ public class CartServiceImpl implements CartService {
 			rs = ps.executeQuery();
 
 			if (rs.next()) {
-
+				// If the product exists, update its quantity.
 				if (prodQty > 0) {
 					ps2 = con.prepareStatement("update usercart set quantity=? where username=? and prodid=?");
 
@@ -292,6 +345,7 @@ public class CartServiceImpl implements CartService {
 					if (k > 0)
 						status = "Product Successfully Updated to Cart!";
 				} else if (prodQty == 0) {
+					// If the new quantity is 0, remove the product from the cart.
 					ps2 = con.prepareStatement("delete from usercart where username=? and prodid=?");
 
 					ps2.setString(1, userId);
@@ -304,7 +358,7 @@ public class CartServiceImpl implements CartService {
 						status = "Product Successfully Updated in Cart!";
 				}
 			} else {
-
+				// If the product does not exist in the cart, insert it.
 				ps2 = con.prepareStatement("insert into usercart values(?,?,?)");
 
 				ps2.setString(1, userId);
@@ -333,6 +387,13 @@ public class CartServiceImpl implements CartService {
 		return status;
 	}
 
+	/**
+	 * Gets the quantity of a specific product in a user's cart.
+	 *
+	 * @param userId The user's ID.
+	 * @param prodId The product's ID.
+	 * @return The quantity of the product, or 0 if not found.
+	 */
 	public int getProductCount(String userId, String prodId) {
 		int count = 0;
 
@@ -357,6 +418,14 @@ public class CartServiceImpl implements CartService {
 		return count;
 	}
 
+	/**
+	 * Gets the quantity of a specific item in a user's cart.
+	 * Note: This seems to be functionally identical to getProductCount.
+	 *
+	 * @param userId The user's ID.
+	 * @param itemId The item's (product's) ID.
+	 * @return The quantity of the item, or 0 if not found.
+	 */
 	@Override
 	public int getCartItemCount(String userId, String itemId) {
 		int count = 0;

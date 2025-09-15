@@ -2,7 +2,17 @@ package com.shashi.utility;
 
 import jakarta.mail.MessagingException;
 
+/**
+ * A utility class with a main method to test email sending functionality.
+ * This class is intended for development and testing purposes only, not for production use.
+ */
 public class TestMail {
+	/**
+	 * Main method to test the email sending functionality.
+	 * It attempts to send a pre-defined test email using JavaMailUtil.
+	 * 
+	 * @param args Command line arguments (not used).
+	 */
 	public static void main(String[] args) {
 		try {
 			String recipient = "ellison.alumni@gmail.com";

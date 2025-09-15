@@ -15,16 +15,29 @@ import com.shashi.service.OrderService;
 import com.shashi.utility.DBUtil;
 import com.shashi.utility.MailMessage;
 
+/**
+ * Implementation of the OrderService interface.
+ * This class handles all business logic related to orders and payments.
+ */
 public class OrderServiceImpl implements OrderService {
 
+	/**
+	 * Processes a successful payment by creating orders for all items in the user's cart.
+	 * This is a complex, high-level method that orchestrates several other services.
+	 * NOTE: This method is currently untestable due to its tight coupling with other service implementations.
+	 *
+	 * @param userName The username of the customer.
+	 * @param paidAmount The total amount paid.
+	 * @return A string indicating the status of the order placement.
+	 */
 	@Override
 	public String paymentSuccess(String userName, double paidAmount) {
 		String status = "Order Placement Failed!";
 
-		List<CartBean> cartItems = new ArrayList<CartBean>();
-		cartItems = new CartServiceImpl().getAllCartItems(userName);
+		// Get all items from the user's cart
+		List<CartBean> cartItems = new CartServiceImpl().getAllCartItems(userName);
 
-		if (cartItems.size() == 0)
+		if (cartItems.isEmpty())
 			return status;
 
 		TransactionBean transaction = new TransactionBean(userName, paidAmount);
@@ -32,36 +45,38 @@ public class OrderServiceImpl implements OrderService {
 
 		String transactionId = transaction.getTransactionId();
 
-		// System.out.println("Transaction: "+transaction.getTransactionId()+"
-		// "+transaction.getTransAmount()+" "+transaction.getUserName()+"
-		// "+transaction.getTransDateTime());
-
+		// Iterate through cart items to create individual orders
 		for (CartBean item : cartItems) {
 
 			double amount = new ProductServiceImpl().getProductPrice(item.getProdId()) * item.getQuantity();
 
 			OrderBean order = new OrderBean(transactionId, item.getProdId(), item.getQuantity(), amount);
 
+			// Add the order to the database
 			ordered = addOrder(order);
 			if (!ordered)
-				break;
+				break; // Stop processing if any order fails
 			else {
+				// Remove the item from the cart after ordering
 				ordered = new CartServiceImpl().removeAProduct(item.getUserId(), item.getProdId());
 			}
 
 			if (!ordered)
 				break;
 			else
+				// Decrement the stock quantity of the sold product
 				ordered = new ProductServiceImpl().sellNProduct(item.getProdId(), item.getQuantity());
 
 			if (!ordered)
 				break;
 		}
 
+		// If all orders were placed successfully, record the transaction
 		if (ordered) {
 			ordered = new OrderServiceImpl().addTransaction(transaction);
 			if (ordered) {
 
+				// Send a confirmation email
 				MailMessage.transactionSuccess(userName, new UserServiceImpl().getFName(userName),
 						transaction.getTransactionId(), transaction.getTransAmount());
 
@@ -72,6 +87,12 @@ public class OrderServiceImpl implements OrderService {
 		return status;
 	}
 
+	/**
+	 * Adds a single order record to the database.
+	 *
+	 * @param order The OrderBean to be added.
+	 * @return true if the order was added successfully, false otherwise.
+	 */
 	@Override
 	public boolean addOrder(OrderBean order) {
 		boolean flag = false;
@@ -87,7 +108,7 @@ public class OrderServiceImpl implements OrderService {
 			ps.setString(2, order.getProductId());
 			ps.setInt(3, order.getQuantity());
 			ps.setDouble(4, order.getAmount());
-			ps.setInt(5, 0);
+			ps.setInt(5, 0); // Shipped status defaults to 0 (not shipped)
 
 			int k = ps.executeUpdate();
 
@@ -102,6 +123,12 @@ public class OrderServiceImpl implements OrderService {
 		return flag;
 	}
 
+	/**
+	 * Adds a transaction record to the database.
+	 *
+	 * @param transaction The TransactionBean to be added.
+	 * @return true if the transaction was added successfully, false otherwise.
+	 */
 	@Override
 	public boolean addTransaction(TransactionBean transaction) {
 		boolean flag = false;
@@ -131,6 +158,12 @@ public class OrderServiceImpl implements OrderService {
 		return flag;
 	}
 
+	/**
+	 * Counts the total number of times a product has been sold.
+	 *
+	 * @param prodId The product ID.
+	 * @return The total quantity of the product sold.
+	 */
 	@Override
 	public int countSoldItem(String prodId) {
 		int count = 0;
@@ -163,6 +196,11 @@ public class OrderServiceImpl implements OrderService {
 		return count;
 	}
 
+	/**
+	 * Retrieves a list of all orders from the database.
+	 *
+	 * @return A list of all OrderBean objects.
+	 */
 	@Override
 	public List<OrderBean> getAllOrders() {
 		List<OrderBean> orderList = new ArrayList<OrderBean>();
@@ -195,6 +233,12 @@ public class OrderServiceImpl implements OrderService {
 		return orderList;
 	}
 
+	/**
+	 * Retrieves all orders for a specific user.
+	 *
+	 * @param emailId The user's email address.
+	 * @return A list of OrderBean objects for that user.
+	 */
 	@Override
 	public List<OrderBean> getOrdersByUserId(String emailId) {
 		List<OrderBean> orderList = new ArrayList<OrderBean>();
@@ -228,6 +272,12 @@ public class OrderServiceImpl implements OrderService {
 		return orderList;
 	}
 
+	/**
+	 * Retrieves detailed information about all orders for a specific user.
+	 *
+	 * @param userEmailId The user's email address.
+	 * @return A list of OrderDetails objects, containing product and transaction information.
+	 */
 	@Override
 	public List<OrderDetails> getAllOrderDetails(String userEmailId) {
 		List<OrderDetails> orderList = new ArrayList<OrderDetails>();
@@ -267,6 +317,13 @@ public class OrderServiceImpl implements OrderService {
 		return orderList;
 	}
 
+	/**
+	 * Marks a specific item within an order as shipped.
+	 *
+	 * @param orderId The ID of the order.
+	 * @param prodId The ID of the product within the order.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String shipNow(String orderId, String prodId) {
 		String status = "FAILURE";

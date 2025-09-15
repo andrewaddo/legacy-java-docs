@@ -15,6 +15,8 @@ import com.shashi.service.impl.ProductServiceImpl;
 
 /**
  * Servlet implementation class UpdateProductSrv
+ * 
+ * This servlet handles updating a product's details (without updating the image).
  */
 @WebServlet("/UpdateProductSrv")
 public class UpdateProductSrv extends HttpServlet {
@@ -25,6 +27,14 @@ public class UpdateProductSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP GET request for updating a product.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -33,6 +43,7 @@ public class UpdateProductSrv extends HttpServlet {
 		String userName = (String) session.getAttribute("username");
 		String password = (String) session.getAttribute("password");
 
+		// Admin authentication check
 		if (userType == null || !userType.equals("admin")) {
 
 			response.sendRedirect("login.jsp?message=Access Denied, Login As Admin!!");
@@ -44,7 +55,6 @@ public class UpdateProductSrv extends HttpServlet {
 			return;
 		}
 
-		// Login success
 
 		String prodId = request.getParameter("pid");
 		String prodName = request.getParameter("name");
@@ -61,6 +71,8 @@ public class UpdateProductSrv extends HttpServlet {
 		product.setProdQuantity(prodQuantity);
 		product.setProdType(prodType);
 
+		// This servlet is untestable because it directly instantiates the ProductServiceImpl
+		// and calls a complex, untestable method within that service.
 		ProductServiceImpl dao = new ProductServiceImpl();
 
 		String status = dao.updateProductWithoutImage(prodId, product);
@@ -71,6 +83,14 @@ public class UpdateProductSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

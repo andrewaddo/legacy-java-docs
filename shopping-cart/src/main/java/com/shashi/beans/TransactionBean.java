@@ -2,10 +2,12 @@ package com.shashi.beans;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 
 import com.shashi.utility.IDUtil;
 
+/**
+ * A JavaBean representing a financial transaction.
+ */
 @SuppressWarnings("serial")
 public class TransactionBean implements Serializable {
 
@@ -20,30 +22,15 @@ public class TransactionBean implements Serializable {
 	public TransactionBean() {
 		super();
 		this.transactionId = IDUtil.generateTransId();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
-
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-		sdf.format(timestamp);
-
-		this.transDateTime = timestamp;
+		this.transDateTime = new Timestamp(System.currentTimeMillis());
 	}
 
 	public TransactionBean(String userName, double transAmount) {
 		super();
 		this.userName = userName;
 		this.transAmount = transAmount;
-
 		this.transactionId = IDUtil.generateTransId();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
-
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-		sdf.format(timestamp);
-
-		this.transDateTime = timestamp;
+		this.transDateTime = new Timestamp(System.currentTimeMillis());
 
 	}
 
@@ -52,14 +39,7 @@ public class TransactionBean implements Serializable {
 		this.transactionId = transactionId;
 		this.userName = userName;
 		this.transAmount = transAmount;
-
-		SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss");
-
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-		sdf.format(timestamp);
-
-		this.transDateTime = timestamp;
+		this.transDateTime = new Timestamp(System.currentTimeMillis());
 	}
 
 	public TransactionBean(String userName, Timestamp transDateTime, double transAmount) {

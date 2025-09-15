@@ -4,11 +4,12 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+/**
+ * A JavaBean representing the detailed view of an ordered item.
+ * This bean aggregates information from orders, products, and transactions tables.
+ */
 public class OrderDetails implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String orderId;
 	private String productId;

@@ -15,6 +15,8 @@ import com.shashi.service.impl.UserServiceImpl;
 
 /**
  * Servlet implementation class LoginSrv
+ * 
+ * This servlet handles user login for both customers and admins.
  */
 @WebServlet("/LoginSrv")
 public class LoginSrv extends HttpServlet {
@@ -24,6 +26,14 @@ public class LoginSrv extends HttpServlet {
 		super();
 	}
 
+	/**
+	 * Handles the HTTP GET request for user login.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -36,9 +46,9 @@ public class LoginSrv extends HttpServlet {
 
 		if (userType.equals("admin")) { // Login as Admin
 
+			// Hardcoded admin credentials check
 			if (password.equals("admin") && userName.equals("admin@gmail.com")) {
-				// valid
-
+				
 				RequestDispatcher rd = request.getRequestDispatcher("adminViewProduct.jsp");
 
 				HttpSession session = request.getSession();
@@ -50,7 +60,7 @@ public class LoginSrv extends HttpServlet {
 				rd.forward(request, response);
 
 			} else {
-				// Invalid;
+				
 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp?message=" + status);
 				rd.include(request, response);
 			}
@@ -62,8 +72,7 @@ public class LoginSrv extends HttpServlet {
 			status = udao.isValidCredential(userName, password);
 
 			if (status.equalsIgnoreCase("valid")) {
-				// valid user
-
+				
 				UserBean user = udao.getUserDetails(userName, password);
 
 				HttpSession session = request.getSession();
@@ -79,8 +88,7 @@ public class LoginSrv extends HttpServlet {
 				rd.forward(request, response);
 
 			} else {
-				// invalid user;
-
+				
 				RequestDispatcher rd = request.getRequestDispatcher("login.jsp?message=" + status);
 
 				rd.forward(request, response);
@@ -90,6 +98,14 @@ public class LoginSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

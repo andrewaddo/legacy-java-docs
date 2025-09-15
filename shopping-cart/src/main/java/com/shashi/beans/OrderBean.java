@@ -2,6 +2,9 @@ package com.shashi.beans;
 
 import java.io.Serializable;
 
+/**
+ * A JavaBean representing a single item within an order.
+ */
 @SuppressWarnings("serial")
 public class OrderBean implements Serializable {
 
@@ -21,7 +24,7 @@ public class OrderBean implements Serializable {
 		this.productId = productId;
 		this.quantity = quantity;
 		this.amount = amount;
-		this.shipped = 0;
+		this.shipped = 0; // By default, an order is not shipped
 	}
 
 	public OrderBean(String transactionId, String productId, int quantity, Double amount, int shipped) {

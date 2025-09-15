@@ -14,11 +14,21 @@ import com.shashi.service.impl.UserServiceImpl;
 
 /**
  * Servlet implementation class RegisterSrv
+ * 
+ * This servlet handles new user registration.
  */
 @WebServlet("/RegisterSrv")
 public class RegisterSrv extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Handles the HTTP GET request for user registration.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -31,6 +41,8 @@ public class RegisterSrv extends HttpServlet {
 		String password = request.getParameter("password");
 		String confirmPassword = request.getParameter("confirmPassword");
 		String status = "";
+
+		// Check if password and confirm password match
 		if (password != null && password.equals(confirmPassword)) {
 			UserBean user = new UserBean(userName, mobileNo, emailId, address, pinCode, password);
 
@@ -46,6 +58,14 @@ public class RegisterSrv extends HttpServlet {
 		rd.forward(request, response);
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

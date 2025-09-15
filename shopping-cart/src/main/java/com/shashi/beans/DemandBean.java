@@ -2,6 +2,9 @@ package com.shashi.beans;
 
 import java.io.Serializable;
 
+/**
+ * A JavaBean representing a user's demand for an out-of-stock product.
+ */
 @SuppressWarnings("serial")
 public class DemandBean implements Serializable {
 

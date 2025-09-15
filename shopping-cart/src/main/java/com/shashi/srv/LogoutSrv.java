@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class LogoutSrv
+ * 
+ * This servlet handles the user logout process.
  */
 @WebServlet("/LogoutSrv")
 public class LogoutSrv extends HttpServlet {
@@ -22,6 +24,15 @@ public class LogoutSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP GET request for logging out.
+	 * It invalidates the current session attributes and forwards the user to the login page.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -29,6 +40,7 @@ public class LogoutSrv extends HttpServlet {
 
 		HttpSession session = request.getSession();
 
+		// Invalidate session attributes by setting them to null
 		session.setAttribute("username", null);
 		session.setAttribute("password", null);
 		session.setAttribute("usertype", null);
@@ -40,6 +52,14 @@ public class LogoutSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

@@ -12,6 +12,11 @@ import javax.servlet.http.HttpSession;
 
 import com.shashi.service.impl.ProductServiceImpl;
 
+/**
+ * Servlet implementation class RemoveProductSrv
+ * 
+ * This servlet handles the removal of a product by an admin.
+ */
 @WebServlet("/RemoveProductSrv")
 public class RemoveProductSrv extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -21,6 +26,14 @@ public class RemoveProductSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP GET request for removing a product.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
@@ -29,19 +42,21 @@ public class RemoveProductSrv extends HttpServlet {
 		String userName = (String) session.getAttribute("username");
 		String password = (String) session.getAttribute("password");
 
+		// Admin authentication check
 		if (userType == null || !userType.equals("admin")) {
 
 			response.sendRedirect("login.jsp?message=Access Denied, Login As Admin!!");
+			return;
 
 		}
 
 		else if (userName == null || password == null) {
 
 			response.sendRedirect("login.jsp?message=Session Expired, Login Again!!");
+			return;
 		}
 
-		// login checked
-
+		// Get product ID from the request
 		String prodId = request.getParameter("prodid");
 
 		ProductServiceImpl product = new ProductServiceImpl();
@@ -54,6 +69,14 @@ public class RemoveProductSrv extends HttpServlet {
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

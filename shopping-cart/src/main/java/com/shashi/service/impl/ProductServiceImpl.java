@@ -15,8 +15,24 @@ import com.shashi.utility.DBUtil;
 import com.shashi.utility.IDUtil;
 import com.shashi.utility.MailMessage;
 
+/**
+ * Implementation of the ProductService interface.
+ * This class handles all business logic related to products.
+ */
 public class ProductServiceImpl implements ProductService {
 
+	/**
+	 * Adds a new product to the database.
+	 * This is a convenience method that constructs a ProductBean before calling the primary addProduct method.
+	 *
+	 * @param prodName Name of the product.
+	 * @param prodType Type or category of the product.
+	 * @param prodInfo Information or description of the product.
+	 * @param prodPrice Price of the product.
+	 * @param prodQuantity Initial quantity of the product.
+	 * @param prodImage InputStream of the product's image.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String addProduct(String prodName, String prodType, String prodInfo, double prodPrice, int prodQuantity,
 			InputStream prodImage) {
@@ -30,6 +46,12 @@ public class ProductServiceImpl implements ProductService {
 		return status;
 	}
 
+	/**
+	 * Adds a new product to the database using a ProductBean.
+	 *
+	 * @param product The ProductBean object containing all product details.
+	 * @return A string indicating the status of the operation.
+	 */
 	@Override
 	public String addProduct(ProductBean product) {
 		String status = "Product Registration Failed!";
@@ -59,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
 
 			} else {
 
+				// This status message is misleading, as a failed insert is not an "Updation Failed".
+				// However, we will keep it as is to maintain original behavior.
 				status = "Product Updation Failed!";
 			}
 
@@ -73,6 +97,12 @@ public class ProductServiceImpl implements ProductService {
 		return status;
 	}
 
+	/**
+	 * Removes a product from the database and any associated user carts.
+	 *
+	 * @param prodId The ID of the product to remove.
+	 * @return A string indicating the status of the removal.
+	 */
 	@Override
 	public String removeProduct(String prodId) {
 		String status = "Product Removal Failed!";
@@ -83,6 +113,7 @@ public class ProductServiceImpl implements ProductService {
 		PreparedStatement ps2 = null;
 
 		try {
+			// First, delete the product from the main product table.
 			ps = con.prepareStatement("delete from product where pid=?");
 			ps.setString(1, prodId);
 
@@ -91,6 +122,7 @@ public class ProductServiceImpl implements ProductService {
 			if (k > 0) {
 				status = "Product Removed Successfully!";
 
+				// Then, delete the product from all user carts to maintain data integrity.
 				ps2 = con.prepareStatement("delete from usercart where prodid=?");
 
 				ps2.setString(1, prodId);
@@ -111,6 +143,13 @@ public class ProductServiceImpl implements ProductService {
 		return status;
 	}
 
+	/**
+	 * Updates an existing product's details, including the image.
+	 *
+	 * @param prevProduct The product bean with the original product ID.
+	 * @param updatedProduct The product bean with the new details.
+	 * @return A string indicating the status of the update.
+	 */
 	@Override
 	public String updateProduct(ProductBean prevProduct, ProductBean updatedProduct) {
 		String status = "Product Updation Failed!";
@@ -154,6 +193,13 @@ public class ProductServiceImpl implements ProductService {
 		return status;
 	}
 
+	/**
+	 * Updates the price of a single product.
+	 *
+	 * @param prodId The ID of the product to update.
+	 * @param updatedPrice The new price.
+	 * @return A string indicating the status of the price update.
+	 */
 	@Override
 	public String updateProductPrice(String prodId, double updatedPrice) {
 		String status = "Price Updation Failed!";
@@ -183,6 +229,11 @@ public class ProductServiceImpl implements ProductService {
 		return status;
 	}
 
+	/**
+	 * Retrieves a list of all products in the database.
+	 *
+	 * @return A list of ProductBean objects.
+	 */
 	@Override
 	public List<ProductBean> getAllProducts() {
 		List<ProductBean> products = new ArrayList<ProductBean>();
@@ -224,6 +275,12 @@ public class ProductServiceImpl implements ProductService {
 		return products;
 	}
 
+	/**
+	 * Retrieves all products that match a given type (category).
+	 *
+	 * @param type The product type to search for.
+	 * @return A list of matching ProductBean objects.
+	 */
 	@Override
 	public List<ProductBean> getAllProductsByType(String type) {
 		List<ProductBean> products = new ArrayList<ProductBean>();
@@ -265,6 +322,12 @@ public class ProductServiceImpl implements ProductService {
 		return products;
 	}
 
+	/**
+	 * Searches for products by type, name, or info.
+	 *
+	 * @param search The search term.
+	 * @return A list of matching ProductBean objects.
+	 */
 	@Override
 	public List<ProductBean> searchAllProducts(String search) {
 		List<ProductBean> products = new ArrayList<ProductBean>();
@@ -310,6 +373,12 @@ public class ProductServiceImpl implements ProductService {
 		return products;
 	}
 
+	/**
+	 * Retrieves the image for a given product ID.
+	 *
+	 * @param prodId The product ID.
+	 * @return A byte array representing the image, or null if not found.
+	 */
 	@Override
 	public byte[] getImage(String prodId) {
 		byte[] image = null;
@@ -341,6 +410,12 @@ public class ProductServiceImpl implements ProductService {
 		return image;
 	}
 
+	/**
+	 * Retrieves all details for a given product ID.
+	 *
+	 * @param prodId The product ID.
+	 * @return A ProductBean object, or null if not found.
+	 */
 	@Override
 	public ProductBean getProductDetails(String prodId) {
 		ProductBean product = null;
@@ -378,6 +453,14 @@ public class ProductServiceImpl implements ProductService {
 		return product;
 	}
 
+	/**
+	 * Updates a product's details without changing the image.
+	 * This method has complex dependencies and is currently untestable without refactoring.
+	 *
+	 * @param prevProductId The original product ID.
+	 * @param updatedProduct A ProductBean with the updated information.
+	 * @return A string indicating the status of the update.
+	 */
 	@Override
 	public String updateProductWithoutImage(String prevProductId, ProductBean updatedProduct) {
 		String status = "Product Updation Failed!";
@@ -389,6 +472,7 @@ public class ProductServiceImpl implements ProductService {
 			return status;
 		}
 
+		// This method recursively calls itself through a new instance, making it hard to test.
 		int prevQuantity = new ProductServiceImpl().getProductQuantity(prevProductId);
 		Connection con = DBUtil.provideConnection();
 
@@ -405,10 +489,12 @@ public class ProductServiceImpl implements ProductService {
 			ps.setString(6, prevProductId);
 
 			int k = ps.executeUpdate();
-			// System.out.println("prevQuantity: "+prevQuantity);
+
+			// If the update is successful and the quantity has increased, notify users who have demanded the product.
 			if ((k > 0) && (prevQuantity < updatedProduct.getProdQuantity())) {
 				status = "Product Updated Successfully!";
-				// System.out.println("updated!");
+
+				// This section creates new service instances, making it untestable without refactoring.
 				List<DemandBean> demandList = new DemandServiceImpl().haveDemanded(prevProductId);
 
 				for (DemandBean demand : demandList) {
@@ -437,11 +523,16 @@ public class ProductServiceImpl implements ProductService {
 
 		DBUtil.closeConnection(con);
 		DBUtil.closeConnection(ps);
-		// System.out.println("Prod Update status : "+status);
 
 		return status;
 	}
 
+	/**
+	 * Retrieves the price of a product.
+	 *
+	 * @param prodId The product ID.
+	 * @return The price of the product, or 0 if not found.
+	 */
 	@Override
 	public double getProductPrice(String prodId) {
 		double price = 0;
@@ -472,6 +563,13 @@ public class ProductServiceImpl implements ProductService {
 		return price;
 	}
 
+	/**
+	 * Decrements the quantity of a product after a sale.
+	 *
+	 * @param prodId The ID of the product sold.
+	 * @param n The number of items sold.
+	 * @return true if the update was successful, false otherwise.
+	 */
 	@Override
 	public boolean sellNProduct(String prodId, int n) {
 		boolean flag = false;
@@ -503,6 +601,12 @@ public class ProductServiceImpl implements ProductService {
 		return flag;
 	}
 
+	/**
+	 * Retrieves the current quantity of a product.
+	 *
+	 * @param prodId The product ID.
+	 * @return The quantity of the product, or 0 if not found.
+	 */
 	@Override
 	public int getProductQuantity(String prodId) {
 

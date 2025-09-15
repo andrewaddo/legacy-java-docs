@@ -128,3 +128,6 @@ Excellent! All 67 tests passed.
 
   What would you like to do next? We can either conclude this testing effort or
   begin refactoring the remaining components to make them fully testable.
+/p
+can you generate comments in the current java code, then generate java         │
+│   doc which describe the functions and the logics of the code ?     

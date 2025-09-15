@@ -23,13 +23,17 @@ npx bmad-method install
 @.bmad-core/agents/pm.md *create-brownfield-prd
 ```
 
+##
+
+
 ## Generate tests - with guided instructions
 
 ```prompts
 generate all other tests for the existing code
 ```
 
-Insist on the task to generate all tests even when the agent wants to refactor or modernize the code
+1. Run the test `mvn -f shopping-cart/pom.xml test`
+2. Insist on the task to generate all tests even when the agent wants to refactor or modernize the code
 
 ### Result
 

@@ -2,7 +2,17 @@ package com.shashi.utility;
 
 import jakarta.mail.MessagingException;
 
+/**
+ * A utility class for sending pre-formatted emails for various application events.
+ */
 public class MailMessage {
+	
+	/**
+	 * Sends a registration success email to a new user.
+	 * 
+	 * @param emailId The recipient's email address.
+	 * @param name The recipient's name.
+	 */
 	public static void registrationSuccess(String emailId, String name) {
 		String recipient = emailId;
 		String subject = "Registration Successfull";
@@ -25,6 +35,14 @@ public class MailMessage {
 		}
 	}
 
+	/**
+	 * Sends a transaction success email after an order is placed.
+	 * 
+	 * @param recipientEmail The recipient's email address.
+	 * @param name The recipient's name.
+	 * @param transId The transaction ID.
+	 * @param transAmount The transaction amount.
+	 */
 	public static void transactionSuccess(String recipientEmail, String name, String transId, double transAmount) {
 		String recipient = recipientEmail;
 		String subject = "Order Placed at Ellison Electronics";
@@ -47,6 +65,14 @@ public class MailMessage {
 		}
 	}
 
+	/**
+	 * Sends an order shipped notification.
+	 * 
+	 * @param recipientEmail The recipient's email address.
+	 * @param name The recipient's name.
+	 * @param transId The transaction ID.
+	 * @param transAmount The transaction amount.
+	 */
 	public static void orderShipped(String recipientEmail, String name, String transId, double transAmount) {
 		String recipient = recipientEmail;
 		String subject = "Hurray!!, Your Order has been Shipped from Ellison Electronics";
@@ -69,6 +95,14 @@ public class MailMessage {
 		}
 	}
 
+	/**
+	 * Sends a notification that a demanded product is now available.
+	 * 
+	 * @param recipientEmail The recipient's email address.
+	 * @param name The recipient's name.
+	 * @param prodName The name of the product.
+	 * @param prodId The ID of the product.
+	 */
 	public static void productAvailableNow(String recipientEmail, String name, String prodName, String prodId) {
 		String recipient = recipientEmail;
 		String subject = "Product " + prodName + " is Now Available at Ellison Electronics";
@@ -80,13 +114,10 @@ public class MailMessage {
 				+ "</font> with " + "product Id <font style=\"color:green;font-weight:bold;\">" + prodId
 				+ "</font> is now available to shop in our store!"
 				+ "<br/><h6>Please Note that this is a demo projet Email and you have not made any real transaction with us and not ordered anything till now!</h6>"
-				+ "      <br/>" + "      Here is The product detail which is now available to shop:<br/>"
-				+ "      <br/>"
-				+ "      <font style=\"color:red;font-weight:bold;\">Product Id: </font><font style=\"color:green;font-weight:bold;\">"
-				+ prodId + " " + "      </font><br/>" + "      <br/>"
-				+ "      <font style=\"color:red;font-weight:bold;\">Product Name: </font> <font style=\"color:green;font-weight:bold;\">"
-				+ prodName + "</font>" + "      <br/><br/>" + "      Thanks for shopping with us!<br/><br/>"
-				+ "      Come Shop Again! <br/<br/><br/> <font style=\"color:green;font-weight:bold;\">Ellison Electronics.</font>"
+				+ "      <br/>" + "      Here is The product detail which is now available to shop:<br/>" + "      <br/>"
+				+ "      <font style=\"color:red;font-weight:bold;\">Product Id: </font><font style=\"color:green;font-weight:bold;\">" + prodId + " " + "      </font><br/>" + "      <br/>"
+				+ "      <font style=\"color:red;font-weight:bold;\">Product Name: </font> <font style=\"color:green;font-weight:bold;\">" + prodName + "</font>"
+				+ "      <br/><br/>" + "      Thanks for shopping with us!<br/><br/>" + "      Come Shop Again! <br/<br/><br/> <font style=\"color:green;font-weight:bold;\">Ellison Electronics.</font>"
 				+ "    </p>" + "    " + "  </body>" + "</html>";
 
 		try {
@@ -96,6 +127,14 @@ public class MailMessage {
 		}
 	}
 
+	/**
+	 * A generic method to send a message.
+	 * 
+	 * @param toEmailId The recipient's email address.
+	 * @param subject The subject of the email.
+	 * @param htmlTextMessage The HTML content of the email.
+	 * @return "SUCCESS" or "FAILURE".
+	 */
 	public static String sendMessage(String toEmailId, String subject, String htmlTextMessage) {
 		try {
 			JavaMailUtil.sendMail(toEmailId, subject, htmlTextMessage);

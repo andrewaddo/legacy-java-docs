@@ -11,8 +11,24 @@ import com.shashi.service.UserService;
 import com.shashi.utility.DBUtil;
 import com.shashi.utility.MailMessage;
 
+/**
+ * Implementation of the UserService interface.
+ * This class handles all user-related business logic, including registration and authentication.
+ */
 public class UserServiceImpl implements UserService {
 
+	/**
+	 * Registers a new user with individual details.
+	 * This is a convenience method that creates a UserBean and calls the primary registerUser method.
+	 *
+	 * @param userName User's full name.
+	 * @param mobileNo User's mobile number.
+	 * @param emailId User's email address (acts as the unique identifier).
+	 * @param address User's address.
+	 * @param pinCode User's pincode.
+	 * @param password User's password.
+	 * @return A string indicating the status of the registration.
+	 */
 	@Override
 	public String registerUser(String userName, Long mobileNo, String emailId, String address, int pinCode,
 			String password) {
@@ -24,6 +40,13 @@ public class UserServiceImpl implements UserService {
 		return status;
 	}
 
+	/**
+	 * Registers a new user using a UserBean.
+	 * Checks if the user is already registered and, if not, inserts the new user record into the database.
+	 *
+	 * @param user The UserBean object containing all user details.
+	 * @return A string indicating the status of the registration, e.g., "Success", "Email Id Already Registered!", or an error message.
+	 */
 	@Override
 	public String registerUser(UserBean user) {
 
@@ -31,6 +54,7 @@ public class UserServiceImpl implements UserService {
 
 		boolean isRegtd = isRegistered(user.getEmail());
 
+		// If the user is already registered, return immediately.
 		if (isRegtd) {
 			status = "Email Id Already Registered!";
 			return status;
@@ -56,6 +80,7 @@ public class UserServiceImpl implements UserService {
 
 			if (k > 0) {
 				status = "User Registered Successfully!";
+				// Send a welcome email to the user upon successful registration.
 				MailMessage.registrationSuccess(user.getEmail(), user.getName().split(" ")[0]);
 			}
 
@@ -65,11 +90,16 @@ public class UserServiceImpl implements UserService {
 		}
 
 		DBUtil.closeConnection(ps);
-		DBUtil.closeConnection(ps);
 
 		return status;
 	}
 
+	/**
+	 * Checks if a user is already registered with the given email address.
+	 *
+	 * @param emailId The email address to check.
+	 * @return true if the user is registered, false otherwise.
+	 */
 	@Override
 	public boolean isRegistered(String emailId) {
 		boolean flag = false;
@@ -101,6 +131,13 @@ public class UserServiceImpl implements UserService {
 		return flag;
 	}
 
+	/**
+	 * Validates user credentials against the database.
+	 *
+	 * @param emailId The user's email.
+	 * @param password The user's password.
+	 * @return "valid" if credentials are correct, otherwise an error message.
+	 */
 	@Override
 	public String isValidCredential(String emailId, String password) {
 		String status = "Login Denied! Incorrect Username or Password";
@@ -133,6 +170,13 @@ public class UserServiceImpl implements UserService {
 		return status;
 	}
 
+	/**
+	 * Retrieves the full details of a user based on their credentials.
+	 *
+	 * @param emailId The user's email.
+	 * @param password The user's password.
+	 * @return A UserBean object populated with the user's details, or null if the user is not found.
+	 */
 	@Override
 	public UserBean getUserDetails(String emailId, String password) {
 
@@ -172,6 +216,12 @@ public class UserServiceImpl implements UserService {
 		return user;
 	}
 
+	/**
+	 * Retrieves only the first name of a user.
+	 *
+	 * @param emailId The user's email.
+	 * @return The first name of the user.
+	 */
 	@Override
 	public String getFName(String emailId) {
 		String fname = "";
@@ -190,6 +240,7 @@ public class UserServiceImpl implements UserService {
 			if (rs.next()) {
 				fname = rs.getString(1);
 
+				// Splits the full name to get the first name.
 				fname = fname.split(" ")[0];
 
 			}
@@ -202,6 +253,12 @@ public class UserServiceImpl implements UserService {
 		return fname;
 	}
 
+	/**
+	 * Retrieves the address of a user.
+	 *
+	 * @param userId The user's email (used as ID).
+	 * @return The address of the user.
+	 */
 	@Override
 	public String getUserAddr(String userId) {
 		String userAddr = "";

@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.shashi.service.impl.ProductServiceImpl;
 
+/**
+ * Servlet implementation class ShowImage
+ * 
+ * This servlet retrieves and displays a product image from the database.
+ */
 @WebServlet("/ShowImage")
 public class ShowImage extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -23,15 +28,25 @@ public class ShowImage extends HttpServlet {
 		super();
 	}
 
+	/**
+	 * Handles the HTTP GET request to display an image.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		String prodId = request.getParameter("pid");
 
+		// This servlet is untestable because it directly instantiates the ProductServiceImpl.
 		ProductServiceImpl dao = new ProductServiceImpl();
 
 		byte[] image = dao.getImage(prodId);
 
+		// If no image is found in the database, a default "noimage.jpg" is served.
 		if (image == null) {
 			File fnew = new File(request.getServletContext().getRealPath("images/noimage.jpg"));
 			BufferedImage originalImage = ImageIO.read(fnew);
@@ -44,10 +59,19 @@ public class ShowImage extends HttpServlet {
 
 		sos = response.getOutputStream();
 
+		// Write the image bytes to the response output stream.
 		sos.write(image);
 
 	}
 
+	/**
+	 * Handles the HTTP POST request by delegating to the doGet method.
+	 * 
+	 * @param request The HttpServletRequest object.
+	 * @param response The HttpServletResponse object.
+	 * @throws ServletException if a servlet-specific error occurs.
+	 * @throws IOException if an I/O error occurs.
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 

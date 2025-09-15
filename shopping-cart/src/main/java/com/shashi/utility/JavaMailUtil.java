@@ -14,7 +14,18 @@ import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
+/**
+ * Utility class for sending emails using the Jakarta Mail API.
+ * Configured specifically for sending emails via Gmail SMTP.
+ */
 public class JavaMailUtil {
+
+	/**
+	 * Sends a simple welcome email.
+	 * 
+	 * @param recipientMailId The recipient's email address.
+	 * @throws MessagingException if there is an error during email sending.
+	 */
 	public static void sendMail(String recipientMailId) throws MessagingException {
 
 		System.out.println("Preparing to send Mail");
@@ -26,14 +37,15 @@ public class JavaMailUtil {
 		properties.put("mail.smtp.starttls.enable", "true");
 		properties.put("mail.smtp.port", "587");
 
+		// Load email credentials from application.properties file
 		ResourceBundle rb = ResourceBundle.getBundle("application");
-
 		String emailId = rb.getString("mailer.email");
 		String passWord = rb.getString("mailer.password");
 
 		properties.put("mail.user", emailId);
 		properties.put("mail.password", passWord);
 
+		// Create a session with an authenticator
 		Session session = Session.getInstance(properties, new Authenticator() {
 
 			@Override
@@ -51,6 +63,14 @@ public class JavaMailUtil {
 
 	}
 
+	/**
+	 * Prepares a simple plain text welcome message.
+	 * 
+	 * @param session The mail session.
+	 * @param myAccountEmail The sender's email address.
+	 * @param recipientEmail The recipient's email address.
+	 * @return A prepared Message object.
+	 */
 	private static Message prepareMessage(Session session, String myAccountEmail, String recipientEmail) {
 
 		try {
@@ -70,6 +90,14 @@ public class JavaMailUtil {
 
 	}
 
+	/**
+	 * Sends a custom HTML email.
+	 * 
+	 * @param recipient The recipient's email address.
+	 * @param subject The subject of the email.
+	 * @param htmlTextMessage The HTML content of the email.
+	 * @throws MessagingException if there is an error during email sending.
+	 */
 	public static void sendMail(String recipient, String subject, String htmlTextMessage) throws MessagingException {
 
 		System.out.println("Preparing to send Mail");
@@ -106,6 +134,16 @@ public class JavaMailUtil {
 
 	}
 
+	/**
+	 * Prepares a MimeMessage with HTML content.
+	 * 
+	 * @param session The mail session.
+	 * @param myAccountEmail The sender's email address.
+	 * @param recipientEmail The recipient's email address.
+	 * @param subject The subject of the email.
+	 * @param htmlTextMessage The HTML content of the email.
+	 * @return A prepared Message object with HTML content.
+	 */
 	private static Message prepareMessage(Session session, String myAccountEmail, String recipientEmail, String subject,
 			String htmlTextMessage) {
 
